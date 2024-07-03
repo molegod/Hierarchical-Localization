@@ -229,14 +229,15 @@ class ImageDataset(torch.utils.data.Dataset):
 @torch.no_grad()
 def main(conf: Dict,
          image_dir: Path,
+         loadedMat: Optional = None,
          export_dir: Optional[Path] = None,
          as_half: bool = True,
          image_list: Optional[Union[Path, List[str]]] = None,
          feature_path: Optional[Path] = None,
-         overwrite: bool = False) -> Path:
+         overwrite: bool = False
+         ) -> Path:
     logger.info('Extracting local features with configuration:'
                 f'\n{pprint.pformat(conf)}')
-
     dataset = ImageDataset(image_dir, conf['preprocessing'], image_list)
     if feature_path is None:
         feature_path = Path(export_dir, conf['output']+'.h5')
@@ -249,8 +250,15 @@ def main(conf: Dict,
         return feature_path
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    Model = dynamic_load(extractors, conf['model']['name'])
-    model = Model(conf['model']).eval().to(device)
+    #netvlad
+
+    if(loadedMat is not None):
+        model = loadedMat
+    else:
+        Model = dynamic_load(extractors, conf['model']['name'])
+        #this line takes a long time
+        model = Model(conf['model']).eval().to(device)
+
 
     loader = torch.utils.data.DataLoader(
         dataset, num_workers=1, shuffle=False, pin_memory=True)

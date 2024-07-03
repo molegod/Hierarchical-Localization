@@ -72,13 +72,14 @@ class NetVLAD(BaseModel):
         # Remove last ReLU + MaxPool2d.
         self.backbone = nn.Sequential(*list(backbone.children())[: -2])
 
+ 
         self.netvlad = NetVLADLayer()
 
         if conf['whiten']:
             self.whiten = nn.Linear(self.netvlad.output_dim, 4096)
-
         # Parse MATLAB weights using https://github.com/uzh-rpg/netvlad_tf_open
         mat = loadmat(checkpoint_path, struct_as_record=False, squeeze_me=True)
+
 
         # CNN weights.
         for layer, mat_layer in zip(self.backbone.children(),

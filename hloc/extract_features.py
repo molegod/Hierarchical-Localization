@@ -229,12 +229,12 @@ class ImageDataset(torch.utils.data.Dataset):
 @torch.no_grad()
 def main(conf: Dict,
          image_dir: Path,
-         loadedMat: Optional = None,
          export_dir: Optional[Path] = None,
          as_half: bool = True,
          image_list: Optional[Union[Path, List[str]]] = None,
          feature_path: Optional[Path] = None,
-         overwrite: bool = False
+         overwrite: bool = False,
+         loadedMat: Optional = None,
          ) -> Path:
     logger.info('Extracting local features with configuration:'
                 f'\n{pprint.pformat(conf)}')
@@ -250,6 +250,7 @@ def main(conf: Dict,
         return feature_path
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
     #netvlad
 
     if(loadedMat is not None):
